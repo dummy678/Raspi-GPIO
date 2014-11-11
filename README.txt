@@ -1,3 +1,6 @@
+下面的函数提供了用来实现对GPIO单独控制的支持，麻烦看一看。
+"Timer"文件夹里面有各种定时器。请看一看。
+
 int gpioSetAlertFunc(unsigned user_gpio, gpioAlertFunc_t f)
 Registers a function to be called (a callback) when the specified gpio changes state.
 

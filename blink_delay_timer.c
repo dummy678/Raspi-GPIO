@@ -28,7 +28,7 @@ int main (void)
         {
             digitalWrite (0, LOW);
         }
-        else if(counter >= du_time_GPIO0 && (counter % (2 * du_time_GPIO0) ==0)
+        else if(counter >= du_time_GPIO0 && (counter % (2 * du_time_GPIO0) ==0))
         {
             digitalWrite (0, HIGH);
         }
@@ -37,7 +37,7 @@ int main (void)
         {
             digitalWrite (1, LOW);
         }
-        else if(counter >= du_time_GPIO1 && (counter % (2 * du_time_GPIO1) ==0)
+        else if(counter >= du_time_GPIO1 && (counter % (2 * du_time_GPIO1) ==0))
         {
             digitalWrite (1, HIGH);
         }
@@ -45,7 +45,7 @@ int main (void)
         {
             digitalWrite (2, LOW);
         }
-        else if(counter >= du_time_GPIO2 && (counter % (2 * du_time_GPIO2) ==0)
+        else if(counter >= du_time_GPIO2 && (counter % (2 * du_time_GPIO2) ==0))
         {
             digitalWrite (2, HIGH);
         }
@@ -53,7 +53,7 @@ int main (void)
         {
             digitalWrite (3, LOW);
         }
-        else if(counter >= du_time_GPIO3 && (counter % (2 * du_time_GPIO3) ==0)
+        else if(counter >= du_time_GPIO3 && (counter % (2 * du_time_GPIO3) ==0))
         {
             digitalWrite (3, HIGH);
         }

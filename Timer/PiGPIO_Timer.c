@@ -1,6 +1,8 @@
 /* ========================================================================== */
 generating arbitrary timed waveforms on multiple user gpios simultaneously;
 uses DMA and interrupts are not disabled
+To compile:
+    gcc -o yourprog yourprog.c -lpigpio -lrt -lpthread
 /* ========================================================================== */
 
     #include <stdio.h>

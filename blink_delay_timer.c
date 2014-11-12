@@ -23,40 +23,41 @@ int main (void)
     {  
         delay(1);
         counter++;
-        if(counter % (2 * du_time_GPIO0))
+        /*LED灯是低电平亮，高电平不亮*/
+        if(counter >= du_time_GPIO0 && (counter % (2 * du_time_GPIO0)) != 0)
         {
             digitalWrite (0, LOW);
         }
-        else if(!(counter % (2 * du_time_GPIO0)))
+        else if(counter >= du_time_GPIO0 && (counter % (2 * du_time_GPIO0) ==0)
         {
             digitalWrite (0, HIGH);
         }
-        else if(counter % (2 * du_time_GPIO1))
+            
+        if(counter >= du_time_GPIO1 && (counter % (2 * du_time_GPIO1)) != 0)
         {
-            digitalWrite (0, LOW);
+            digitalWrite (1, LOW);
         }
-        else if(!(counter % (2 * du_time_GPIO1)))
+        else if(counter >= du_time_GPIO1 && (counter % (2 * du_time_GPIO1) ==0)
         {
-            digitalWrite (0, HIGH);
+            digitalWrite (1, HIGH);
+        }
+        if(counter >= du_time_GPIO2 && (counter % (2 * du_time_GPIO2)) != 0)
+        {
+            digitalWrite (2, LOW);
+        }
+        else if(counter >= du_time_GPIO2 && (counter % (2 * du_time_GPIO2) ==0)
+        {
+            digitalWrite (2, HIGH);
+        }
+        if(counter >= du_time_GPIO3 && (counter % (2 * du_time_GPIO3)) != 0)
+        {
+            digitalWrite (3, LOW);
+        }
+        else if(counter >= du_time_GPIO3 && (counter % (2 * du_time_GPIO3) ==0)
+        {
+            digitalWrite (3, HIGH);
         }
         
-        if(counter % (2 * du_time_GPIO2))
-        {
-            digitalWrite (0, LOW);
-        }
-        else if(!(counter % (2 * du_time_GPIO2)))
-        {
-            digitalWrite (0, HIGH);
-        }
-
-        else if(counter % (2 * du_time_GPIO3))
-        {
-            digitalWrite (0, LOW);
-        }
-        else if(!(counter % (2 * du_time_GPIO3)))
-        {
-            digitalWrite (0, HIGH);
-        }
 
         else
         {
@@ -75,5 +76,3 @@ int main (void)
 
     return 0 ;
 }
-
-    

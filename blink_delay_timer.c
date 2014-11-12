@@ -14,6 +14,9 @@ int main (void)
     /*激活GPIO口，使之可用*/
     wiringPiSetup () ; // Activate GPIO
     pinMode (0, OUTPUT) ;
+    pinMode (1, OUTPUT) ;
+    pinMode (2, OUTPUT) ;
+    pinMode (3, OUTPUT) ;
     printf("GPIO now is active!\n");
 
     /*用delay进行延时，每次延时计数一次，*/

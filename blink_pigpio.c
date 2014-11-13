@@ -6,15 +6,15 @@ To compile:
     gcc -o yourprog yourprog.c -lpigpio -lrt -lpthread -lcs50
 ==========================================================================  */
 
-    #include <stdio.h>
-    #include <pigpio.h>
-	#include <cs50.h>
+#include <stdio.h>
+#include <pigpio.h>
+#include <cs50.h>
 
-//  GPIO port number is represented by theoir Boradcom Number (BCM)
-    #define PORT0 17
-	#define PORT1 18
-	#define PORT2 27 
-	#define PORT3 22
+//  GPIO port number is represented by their Boradcom Number (BCM)
+#define PORT0 17
+#define PORT1 18
+#define PORT2 27 
+#define PORT3 22
 /********************************************************************************
 +-----+-----+---------+------+---+--B Plus--+---+------+---------+-----+-----+
 | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
@@ -45,47 +45,77 @@ To compile:
 
 *********************************************************************************/
 
-    gpioPulse_t pulse[2]; /* only need two pulses for a square wave */
+gpioPulse_t pulse[2]; // only need two pulses for a square wave
 
-    int main(int argc, char *argv[])
-    {
-		printf("There is no sanity check, so be a good user!"\n)
-		int secs, us = 0;
-		printf("How many seconds would you like program to run?\n");
+float converter();
+
+int main(int argc, char *argv[])
+{
+	int secs, us = 0;
+	printf("How many seconds would you like program to run?\n");
+	do
+	{
 		secs = GetInt();
+		if (secs > 3600)
+		{
+			printf("The max time is 3600 seconds, please retry:\n")
+		}
+	} while (secs <= 0 || secs > 3600);
 
-       if (argc>1) us   = atoi(argv[1]); /* square wave micros */
-       if (argc>2) secs = atoi(argv[2]); /* program run seconds */
+	us = converter();
+	if (argc > 1)
+	{
+		us = atoi(argv[1]); // square wave micros
+	}
+	if (argc > 2) 
+	{
+		secs = atoi(argv[2]); // program run seconds 
+	}
+/*	
+	if (us < 2)
+	{
+		us = 2; // minimum of 2 micros per pulse 
+	}
+*/
 
-       if (us<2) us = 2; /* minimum of 2 micros per pulse */
+	//Initializing the "pigpio" library and check if initialization sucessful 
+	if (gpioInitialise() < 0)
+	{
+		printf("Initializing failed!\n");
+		return 1;
+	}
 
-       if ((secs<1) || (secs>3600)) secs = 3600;
+	// Set the port mode to "output"
+	gpioSetMode(PORT0, PI_OUTPUT);
+	gpioSetMode(PORT1, PI_OUTPUT);
+	gpioSetMode(PORT2, PI_OUTPUT);
+	gpioSetMode(PORT3, PI_OUTPUT);
 
-	   if (gpioInitialise() < 0)
-			{
-			printf("Initializing failed!\n");
-			return 1;
-			}
+	pulse[0].gpioOn = (1<<LED); /* high */
+	pulse[0].gpioOff = 0;
+	pulse[0].usDelay = us;
 
-       gpioSetMode(LED, PI_OUTPUT);
+	pulse[1].gpioOn = 0;
+	pulse[1].gpioOff = (1<<LED); /* low */
+	pulse[1].usDelay = us;
 
-       pulse[0].gpioOn = (1<<LED); /* high */
-       pulse[0].gpioOff = 0;
-       pulse[0].usDelay = us;
+	gpioWaveClear();
+	gpioWaveAddGeneric(2, pulse);
+	gpioWaveTxStart(PI_WAVE_MODE_REPEAT);
+	sleep(secs);
+	gpioWaveTxStop();
+	gpioTerminate();
 
-       pulse[1].gpioOn = 0;
-       pulse[1].gpioOff = (1<<LED); /* low */
-       pulse[1].usDelay = us;
+	return 0;
+}
 
-       gpioWaveClear();
-
-       gpioWaveAddGeneric(2, pulse);
-
-       gpioWaveTxStart(PI_WAVE_MODE_REPEAT);
-
-       sleep(secs);
-
-       gpioWaveTxStop();
-
-       gpioTerminate();
-    }
+float converter()
+{
+	float freq = 0;
+	do
+	{
+		printf("Pls input a freq for GPIO:\n");
+		freq = GetFloat();
+	} while (freq <= 0);
+	return 500000.0 / freq;
+}

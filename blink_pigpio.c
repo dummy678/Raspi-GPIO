@@ -119,19 +119,6 @@ int main(void)
 	pulse[0].gpioOn = 0;
 	pulse[0].usDelay = 31.25;
 	pulse[0].gpioOff = (1 << PORT3);
-
-	pulse[0].gpioOn = 0;
-	pulse[0].usDelay = 10.42;
-	pulse[0].gpioOff = (1 << PORT2);
-
-	pulse[0].gpioOn = 0;
-	pulse[0].usDelay = 31.25;
-	pulse[0].gpioOff = (1 << PORT3);
-
-	pulse[1].gpioOn = 0;
-	pulse[1].gpioOff = (1<<PORT0); 
-	pulse[1].usDelay = us;
-
 	gpioWaveClear();
 	gpioWaveAddNew();
 	gpioWaveAddGeneric(2, pulse);

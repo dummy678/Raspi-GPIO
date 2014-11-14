@@ -4,34 +4,53 @@
 
 int main (void)
 {
-   float freq, m_sec = 0;
-   int i = 0;
-   for (i = 0; i < 4; i++)
-   {
-      do
-      {
-         printf("Pls input a freq for GPIO %d:\n", i);
-         freq = GetFloat();
-      }
-      while (freq < 0);
-      printf("Frequency for GPIO %d is: %.2f Hz\n", i, freq);
-      m_sec = 500.0/freq;
-      printf("Time is %.2f ms\n", m_sec);
-   }
-
+	float ms[4], freq[4];
+	int i = 0;
 /*
-   printf("GPIO now is active!\n");
-   wiringPiSetup () ; // Activate GPIO
-   pinMode (0, OUTPUT) ;
+	for (; i < 4; i++)
+	{
+
+		do
+		{
+			printf("Pls input a freq for port %d:\n", i);
+			freq[i] = GetFloat();
+			if (freq <= 0)
+			{
+				printf("error: the frequency must be greater than zero!\nplease retry:\n");
+			}
+		} while (freq <= 0);
+		printf("Frequency: %.2f Hz\n", freq[i]);
+		ms[i] = 500.0 / freq[i];
+		printf("Time is %.2f ms\n", ms[i]);
+	}
+*/
+	wiringPiSetup(); // Activate GPIO
+	pinMode(0, OUTPUT);
+	pinMode(1, OUTPUT);
+	pinMode(2, OUTPUT);
+	pinMode(3, OUTPUT);
+	digitalWrite(0, HIGH);
+	digitalWrite(1, HIGH);
+	digitalWrite(2, HIGH);
+	digitalWrite(3, HIGH);
+	printf("GPIO now is active!\n");
+	delay(200);
 
    while(1)
    {
-      digitalWrite (0, HIGH);
-      delay (m_sec[2]) ;
-      digitalWrite (0,  LOW);
-      delay (m_sec[2]) ;
+		delay(31.25);
+		digitalWrite(3, LOW);
+		delay(10.42);
+		digitalWrite(2, LOW);
+		delay(8.33);
+		digitalWrite(1, LOW);
+		delay(12.5);
+		digitalWrite(3, HIGH);
+		delay(4.17);
+		digitalWrite(0, LOW);
+		delay(16.67);
+		digitalWrite(3, HIGH);
    }
-*/
 
-    return 0 ;
+return 0 ;
 }

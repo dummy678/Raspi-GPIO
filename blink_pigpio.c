@@ -3,8 +3,10 @@ generating arbitrary timed waveforms on multiple user gpios simultaneously;
 uses DMA and interrupts are not disabled;
 
 To compile:
-    gcc -o yourprog yourprog.c -lpigpio -lrt -lpthread -lcs50
+    gcc -o yourprog yourprog.c -lpigpio -lrt -lpthread -lcs50 -O3
 ==========================================================================  */
+
+// To-Do : I am creating the wave! 
 
 #include <stdio.h>
 #include <pigpio.h>
@@ -45,77 +47,111 @@ To compile:
 
 *********************************************************************************/
 
-gpioPulse_t pulse[2]; // only need two pulses for a square wave
-
-float converter();
-
-int main(int argc, char *argv[])
+int main(void)
 {
-	int secs, us = 0;
-	printf("How many seconds would you like program to run?\n");
+	//Asking for how long will the LEDs to blink (wave to transmit)
+	int secs = 0;
+	printf("how long will the LEDs to blink (wave to transmit)?\n");
 	do
 	{
 		secs = GetInt();
+		printf("Second(s)");
 		if (secs > 3600)
 		{
-			printf("The max time is 3600 seconds, please retry:\n")
+			printf("The max time is 3600 seconds, please retry:\n");
 		}
 	} while (secs <= 0 || secs > 3600);
+	printf("The LEDs will blink for %d seconds\n", secs);
 
-	us = converter();
-	if (argc > 1)
+	//Asking for frequncy input and convert it into ms
+	float us[4], freq[4];
+	int i = 0;
+	for (i; i < 4; i++)
 	{
-		us = atoi(argv[1]); // square wave micros
+		do
+		{
+			printf("Pls input a freq for port %d:\n", i);
+			freq[i] = GetFloat();
+			if (freq <= 0)
+			{
+				printf("error: the frequency must be greater than zero!\nplease retry:\n");
+			}
+		} while (freq <= 0);
+		printf("Frequency: %.2f Hz\n", freq[i]);
+		us[i] = 500.0 / freq[i];
+		printf("Time is %.2f ms\n", us[i]);
 	}
-	if (argc > 2) 
-	{
-		secs = atoi(argv[2]); // program run seconds 
-	}
-/*	
-	if (us < 2)
-	{
-		us = 2; // minimum of 2 micros per pulse 
-	}
-*/
 
 	//Initializing the "pigpio" library and check if initialization sucessful 
+	printf("Initialzing GPIO...");
 	if (gpioInitialise() < 0)
 	{
-		printf("Initializing failed!\n");
+		printf("error:Initializing failed!\n");
 		return 1;
 	}
 
-	// Set the port mode to "output"
+	printf("Setting up GPIO ports...\n");
+	// Set the port mode to "output" and into HIGH
 	gpioSetMode(PORT0, PI_OUTPUT);
 	gpioSetMode(PORT1, PI_OUTPUT);
 	gpioSetMode(PORT2, PI_OUTPUT);
 	gpioSetMode(PORT3, PI_OUTPUT);
+	gpioWrite(PORT0, 1);
+	gpioWrite(PORT1, 1);
+	gpioWrite(PORT2, 1);
+	gpioWrite(PORT3, 1);
 
-	pulse[0].gpioOn = (1<<LED); /* high */
-	pulse[0].gpioOff = 0;
-	pulse[0].usDelay = us;
+	//While using NPN transistor HIGH on the GPIO pin will turn transistor on
+	//while using a PNP transistor a LOW on the pin turn the transistor on
+	
+	//Creating a square wave
+	printf("Creating the wave..\n");
+	gpioPulse_t pulse[2]; // The original comment is misleading ---(only need two pulses for a square wave)
+	
+	/**************************************************************
+		The fields specify
+
+		1) the gpios to be switched on at the start of the pulse.
+		2) the gpios to be switched off at the start of the pulse.
+		3) the delay in microseconds before the next pulse. 
+	***************************************************************/
+
+	pulse[0].gpioOn = 0;
+	pulse[0].usDelay = 31.25;
+	pulse[0].gpioOff = (1 << PORT3);
+
+	pulse[0].gpioOn = 0;
+	pulse[0].usDelay = 10.42;
+	pulse[0].gpioOff = (1 << PORT2);
+
+	pulse[0].gpioOn = 0;
+	pulse[0].usDelay = 31.25;
+	pulse[0].gpioOff = (1 << PORT3);
 
 	pulse[1].gpioOn = 0;
-	pulse[1].gpioOff = (1<<LED); /* low */
+	pulse[1].gpioOff = (1<<PORT0); 
 	pulse[1].usDelay = us;
 
 	gpioWaveClear();
+	gpioWaveAddNew();
 	gpioWaveAddGeneric(2, pulse);
-	gpioWaveTxStart(PI_WAVE_MODE_REPEAT);
+
+	int wave_id = gpioWaveCreate();
+	printf("wave id : %d\n", wave_id);
+	if (wave_id < 0)
+	{
+		printf("error:Failed to create wave!\n");
+		return 2;
+	}
+
+	//Begin to transmitting the wave
+	printf("Wave transmitting...\n");
+	gpioWaveTxSend(wave_id, PI_WAVE_MODE_REPEAT);
 	sleep(secs);
 	gpioWaveTxStop();
 	gpioTerminate();
+	printf("error:Failed to create wave!\n");
 
 	return 0;
 }
 
-float converter()
-{
-	float freq = 0;
-	do
-	{
-		printf("Pls input a freq for GPIO:\n");
-		freq = GetFloat();
-	} while (freq <= 0);
-	return 500000.0 / freq;
-}
